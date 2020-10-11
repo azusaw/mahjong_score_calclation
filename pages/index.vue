@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <v-container class="mx-auto" style="text-align: center; max-width: 30rem">
+    <v-container class="mx-auto" style="text-align: center; max-width: 27rem">
       <h1 style="font-size: 1.5rem; line-height: 6rem; color: #FB8C00; letter-spacing: 0.2rem">麻雀&nbsp;点数計算ツール</h1>
         <v-tooltip bottom color="#F3F3F3">
           <template v-slot:activator="{ on, attrs }">
@@ -20,17 +20,17 @@
           </span>
         </v-tooltip>
       で点数を計算するよ！
-      <v-form class="my-2">
-        <v-row v-for="(item, index) in results" :key="index">
+      <v-form class="my-2 mx-4">
+        <v-row v-for="(item, index) in member" :key="index" align="center">
           <v-col cols="4">
-            <v-select :items="member" v-model="item.name" :label='`${item.rank}位`' required append-icon='$mdiMenuDown'></v-select>
+            <span style="font-size: 1.2rem">{{item.name}}</span>
           </v-col>
           <v-col cols="8">
             <v-text-field v-model="item.result" label="点数" type="number" required></v-text-field>
           </v-col>
         </v-row>
       </v-form>
-      <v-btn x-large dark color="#FFA726" class="mt-4" @click="calc()" >
+      <v-btn x-large dark color="#FFA726" class="mt-2" @click="calc()" >
         点数を計算する
       </v-btn>
       <div style="line-height: 5rem">
@@ -45,14 +45,14 @@
       </div>
       <v-dialog v-model="dialog" max-width="30rem">
         <v-card class="pa-4">
-            <div v-for="(item, index) in results" :key="index" style="line-height: 2.5rem; font-size: 1rem">
-              {{item.rank}}位&ensp;{{item.name}}：&nbsp;{{item.result}}&ensp;
-              <span v-if="item.point >= 0" style="font-weight: bold; color: #66BB6A">+{{item.point}}</span>
-              <span v-else style="font-weight: bold; color: #EF5350">{{item.point}}</span>
-            </div>
-            <div class="my-2" style="text-align: center">
-              <img :src="img" width="250"></img>
-            </div>
+          <div v-for="(item, index) in results" :key="index" style="line-height: 2.5rem; font-size: 1rem">
+            {{item.rank}}位&ensp;{{item.name}}：&nbsp;{{item.result}}&ensp;
+            <span v-if="item.point >= 0" style="font-weight: bold; color: #66BB6A">+{{item.point}}</span>
+            <span v-else style="font-weight: bold; color: #EF5350">{{item.point}}</span>
+          </div>
+          <div class="my-2" style="text-align: center">
+            <img :src="img" width="250"></img>
+          </div>
         </v-card>
       </v-dialog>
     </v-container>
@@ -65,7 +65,24 @@ export default {
     calc() {
       const OKA = 25000
       const UMA = [5, 10]
+      let i = 0
 
+      /* 順位を確定し、画像を設定 */
+      for(var tmp1 of this.member) {
+        for(var tmp2 of this.results) {
+          if (tmp1.name == tmp2.name) {
+            tmp2.result = tmp1.result
+          }
+        }
+      }
+      this.results.sort(function(a, b){
+        if(a.result < b.result) return 1
+        if(a.result > b.result) return -1
+        return 0
+      })
+      for(var tmp of this.results) {
+        tmp.rank = ++i
+      }
       this.setImg()
 
       for(var tmp of this.results) {
@@ -73,7 +90,7 @@ export default {
         tmp.point = Math.floor((tmp.result - OKA) / 1000)
         if(tmp.result % 1000 >= 600) {
           tmp.point++
-        } else if(tmp.result % 1000 < 0 && tmp.result % 1000 >= -500) {
+        } else if(tmp.result % 1000 < 0 && tmp.result % 1000 > -600) {
           /* 負数はMath.floorで1多く丸められるので、捨の場合は+1する */
           tmp.point++
         }
@@ -138,13 +155,17 @@ export default {
   data: () => ({
     dialog: false,
     member: [
-      "宮谷", "わた", "八田", "半田"
+      { name: "宮谷", result: '' },
+      { name: "わた", result: '' },
+      { name: "八田", result: '' },
+      { name: "半田", result: '' },
     ],
+    /* 入力状態を保存するため入力と別の配列で管理する */
     results: [
-      { rank: 1, name: "", result: '', point: 0 },
-      { rank: 2, name: "", result: '', point: 0 },
-      { rank: 3, name: "", result: '', point: 0 },
-      { rank: 4, name: "", result: '', point: 0 },
+      { rank: '', name: "宮谷", result: '', point: 0 },
+      { rank: '', name: "わた", result: '', point: 0 },
+      { rank: '', name: "八田", result: '', point: 0 },
+      { rank: '', name: "半田", result: '', point: 0 },
     ],
     img: ''
   })
