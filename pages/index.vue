@@ -20,17 +20,17 @@
           </span>
         </v-tooltip>
       で点数を計算するよ！
-      <v-form class="my-2 mx-4">
+      <v-form class="ma-4">
         <v-row v-for="(item, index) in member" :key="index" align="center">
           <v-col cols="4">
             <span style="font-size: 1.2rem">{{item.name}}</span>
           </v-col>
           <v-col cols="8">
-            <v-text-field v-model="item.result" label="点数" type="number" required></v-text-field>
+            <v-text-field v-model="item.result" label="点数" type="number" required dense></v-text-field>
           </v-col>
         </v-row>
       </v-form>
-      <v-btn x-large dark color="#FFA726" class="mt-2" @click="calc()" >
+      <v-btn x-large dark color="#FFA726" @click="calc()" >
         点数を計算する
       </v-btn>
       <div style="line-height: 5rem">
