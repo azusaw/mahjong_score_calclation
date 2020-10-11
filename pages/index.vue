@@ -101,7 +101,6 @@ export default {
 
       for(var tmp of this.results) {
         if(random % 2 == 0 && tmp.rank == 1) {
-          console.log("win:" + tmp.name)
           /* 勝利画像を設定 */
           switch(tmp.name) {
             case '宮谷':
@@ -113,11 +112,10 @@ export default {
             case '八田':
               img = 'gori'
               break
-            case '半田':
+            default:
               img = 'kaiji'
           }
         } else if(random % 2 == 1 && tmp.rank == 4) {
-          console.log("lose:" + tmp.name)
           /* 敗北画像を設定 */
           switch(tmp.name) {
             case '宮谷':
@@ -129,7 +127,7 @@ export default {
             case '八田':
               img = 'uozumi'
               break
-            case '半田':
+            default:
               img = 'hiro'
           }
         }
