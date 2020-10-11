@@ -73,7 +73,7 @@ export default {
         tmp.point = Math.floor((tmp.result - OKA) / 1000)
         if(tmp.result % 1000 >= 600) {
           tmp.point++
-        } else if(tmp.result % 1000 <= -500) {
+        } else if(tmp.result % 1000 < 0 && tmp.result % 1000 >= -500) {
           /* 負数はMath.floorで1多く丸められるので、捨の場合は+1する */
           tmp.point++
         }
