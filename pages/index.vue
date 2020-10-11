@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <v-container class="mx-auto" style="text-align: center; max-width: 30rem">
-      <h1 style="font-size: 1.5rem; line-height: 6rem; color: #FB8C00">麻雀&nbsp;点数計算ツール</h1>
+      <h1 style="font-size: 1.5rem; line-height: 6rem; color: #FB8C00; letter-spacing: 0.2rem">麻雀&nbsp;点数計算ツール</h1>
         <v-tooltip bottom color="#F3F3F3">
           <template v-slot:activator="{ on, attrs }">
             <span style="font-weight: bold; font-size: 1.1rem" v-bind="attrs" v-on="on">
@@ -30,9 +30,19 @@
           </v-col>
         </v-row>
       </v-form>
-        <v-btn x-large dark color="#FFA726" class="mt-4" @click="calc()" >
-          点数を計算する
-        </v-btn>
+      <v-btn x-large dark color="#FFA726" class="mt-4" @click="calc()" >
+        点数を計算する
+      </v-btn>
+      <div style="line-height: 5rem">
+        累計のExcelは
+        <a
+          href='https://onedrive.live.com/view.aspx?resid=381523E30066D964!1985&ithint=file%2cxlsx&wdLOR=c9BA1D837-F38A-414C-B55D-38D525B8F16B&authkey=!AFTAnNJkNG1bLMY'
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ここをクリック
+        </a>
+      </div>
       <v-dialog v-model="dialog" max-width="30rem">
         <v-card class="pa-4">
             <div v-for="(item, index) in results" :key="index" style="line-height: 2.5rem; font-size: 1rem">
@@ -40,8 +50,9 @@
               <span v-if="item.point >= 0" style="font-weight: bold; color: #66BB6A">+{{item.point}}</span>
               <span v-else style="font-weight: bold; color: #EF5350">{{item.point}}</span>
             </div>
-            <v-img class="my-6 mx-auto" :src="img" width="250" eager></v-img>
-
+            <div class="my-2" style="text-align: center">
+              <img :src="img" width="250"></img>
+            </div>
         </v-card>
       </v-dialog>
     </v-container>
@@ -50,11 +61,12 @@
 
 <script>
 export default {
-
   methods: {
     calc() {
       const OKA = 25000
       const UMA = [5, 10]
+
+      this.setImg()
 
       for(var tmp of this.results) {
         /* オカの計算 */   
@@ -81,13 +93,12 @@ export default {
             tmp.point -= UMA[1]
         }
       }
-      this.setImg()
       this.dialog = true
     },
     setImg() {
       var img = ''
       var random = Math.floor( Math.random() * 11 )
-      console.log(random)
+
       for(var tmp of this.results) {
         if(random % 2 == 0 && tmp.rank == 1) {
           console.log("win:" + tmp.name)
