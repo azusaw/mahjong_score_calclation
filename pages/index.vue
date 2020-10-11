@@ -70,8 +70,9 @@ export default {
       /* 順位を確定し、画像を設定 */
       for(var tmp1 of this.member) {
         for(var tmp2 of this.results) {
+          console.log(tmp1.name + " : " + tmp2.result)
           if (tmp1.name == tmp2.name) {
-            tmp2.result = tmp1.result
+            tmp2.result = Number(tmp1.result)
           }
         }
       }
@@ -94,7 +95,6 @@ export default {
           /* 負数はMath.floorで1多く丸められるので、捨の場合は+1する */
           tmp.point++
         }
-
         /* ウマの計算 */
         switch(tmp.rank) {
           case 1:
@@ -110,6 +110,7 @@ export default {
             tmp.point -= UMA[1]
         }
       }
+      console.log(this.results)
       this.dialog = true
     },
     setImg() {
