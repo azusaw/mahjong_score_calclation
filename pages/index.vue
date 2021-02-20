@@ -1,57 +1,153 @@
 <template>
-  <div class="home">
-    <v-container class="mx-auto" style="text-align: center; max-width: 27rem">
-      <h1 style="font-size: 1.5rem; line-height: 6rem; color: #FB8C00; letter-spacing: 0.2rem">麻雀&nbsp;点数計算ツール</h1>
-        <v-tooltip bottom color="#F3F3F3">
-          <template v-slot:activator="{ on, attrs }">
-            <span style="font-weight: bold; font-size: 1.1rem" v-bind="attrs" v-on="on">
-              <v-icon class="mx-1" color="primary">$mdiHelpCircleOutline</v-icon>A班ルール
-            </span>
-          </template>
-          <span style="color: #333333; line-height: 2rem">
-            <ol>
-              <li>&nbsp;オカなし(25000点返し)</li>
-              <li>&nbsp;ウマあり(5-10)</li>
-              <li>&nbsp;焼き鳥の罰符は6000点(有効の場合)</li>
-              <li>&nbsp;罰符対象外の人で分ける</li>
-              <li>&nbsp;飛びの罰符はなし</li>
-              <li>&nbsp;1000点単位以下の端数は五捨六入</li>
-            </ol>
+  <div class="text bg">
+    <v-container class="mx-auto text-center" style="max-width: 25rem">
+      <div class="mx-auto text-right">
+        <v-btn depressed plain color="#fff" @click="changeLang">{{
+          this.lang
+        }}</v-btn>
+      </div>
+      <h1
+        style="
+          color: #ff8f00;
+          font-size: 1.2rem;
+          line-height: 6rem;
+          letter-spacing: 3px;
+        "
+      >
+        {{ wordList.TOOL_NAME }}
+      </h1>
+      <v-tooltip bottom color="#F3F3F3">
+        <template v-slot:activator="{ on, attrs }">
+          <span style="font-size: 1.1rem" v-bind="attrs" v-on="on"
+            ><v-icon class="mx-2">$mdiHelpCircleOutline</v-icon
+            ><b>{{ wordList.RULE }}</b>
           </span>
-        </v-tooltip>
-      で点数を計算するよ！
-      <v-form class="ma-4">
-        <v-row v-for="(item, index) in member" :key="index" align="center">
-          <v-col cols="4">
-            <span style="font-size: 1.2rem">{{item.name}}</span>
-          </v-col>
-          <v-col cols="8">
-            <v-text-field v-model="item.result" label="点数" type="number" required dense></v-text-field>
-          </v-col>
-        </v-row>
-      </v-form>
-      <v-btn x-large dark color="#FFA726" @click="calc()" >
-        点数を計算する
-      </v-btn>
-      <div style="line-height: 5rem">
-        累計のExcelは
+        </template>
+        <div class="text">
+          <ol>
+            <template v-for="rule in wordList.RULE_DETAIL">
+              <li>&nbsp;{{ rule }}</li>
+            </template>
+          </ol>
+        </div>
+      </v-tooltip>
+      {{ wordList.RULE_DESCRIPTION }}
+      <v-checkbox
+        v-model="isNotAhanMember"
+        :label="wordList.I_AM_NOT_AHAN"
+        on-icon="$mdiCheckboxMarked"
+        off-icon="$mdiCheckboxBlankOutline"
+        class="pl-2"
+      />
+      <v-expansion-panels v-if="isNotAhanMember" flat>
+        <v-expansion-panel style="background-color: #fff2e3">
+          <v-expansion-panel-header>{{
+            wordList.EDITING_RULES
+          }}</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-form ref="form" v-model="rulesValid">
+              <v-row align="center">
+                <v-col cols="4">{{ wordList.OKA }}</v-col>
+                <v-col cols="8">
+                  <v-text-field
+                    v-model="oka"
+                    :label="wordList.POINTS"
+                    type="number"
+                    :rules="[(v) => !!v || wordList.REQUIRED]"
+                    dense
+                  />
+                </v-col>
+                <v-col cols="4">{{ wordList.UMA }}</v-col>
+                <v-col cols="8">
+                  <template v-for="idx of Object.keys(uma)">
+                    <v-text-field
+                      v-model="uma[idx]"
+                      type="number"
+                      :rules="[(v) => !!v || wordList.REQUIRED]"
+                      dense
+                      style="width: 50%"
+                    />
+                  </template>
+                </v-col>
+                <v-col cols="4">{{ wordList.ROUND }}</v-col>
+                <v-col cols="8">
+                  <v-text-field
+                    v-model="roundBase"
+                    type="number"
+                    :rules="[(v) => !!v || wordList.REQUIRED]"
+                    dense
+                    :suffix="`${wordList.ROUND_DOWN} ${+roundBase + 1} ${
+                      wordList.ROUND_UP
+                    }`"
+                  />
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+      <v-card class="my-4 pa-8">
+        <v-form ref="form" v-model="scoresValid">
+          <v-row v-for="(item, idx) in member" :key="idx" align="center">
+            <v-col cols="4">
+              <v-text-field
+                v-if="isNotAhanMember"
+                v-model="item.name"
+                :label="wordList.NAME + ++idx"
+                :rules="[(v) => !!v || wordList.REQUIRED]"
+                dense
+              />
+              <span v-else style="font-size: 1.2rem">{{ item.name }}</span>
+            </v-col>
+            <v-col cols="8">
+              <v-text-field
+                v-model="item.result"
+                :label="wordList.POINTS"
+                type="number"
+                :rules="[(v) => !!v || wordList.REQUIRED]"
+                dense
+              />
+            </v-col>
+          </v-row>
+          <v-btn
+            x-large
+            color="primary"
+            :disabled="!rulesValid || !scoresValid"
+            @click="calc()"
+          >
+            <span style="font-size: 1.2rem">{{ wordList.CALCULATE }}</span>
+          </v-btn>
+        </v-form>
+      </v-card>
+      <div>
+        {{ wordList.SCORE_DESCRIPTION }}
         <a
-          href='https://onedrive.live.com/view.aspx?resid=381523E30066D964!1985&ithint=file%2cxlsx&wdLOR=c9BA1D837-F38A-414C-B55D-38D525B8F16B&authkey=!AFTAnNJkNG1bLMY'
+          href="https://onedrive.live.com/view.aspx?resid=381523E30066D964!1985&ithint=file%2cxlsx&wdLOR=c9BA1D837-F38A-414C-B55D-38D525B8F16B&authkey=!AFTAnNJkNG1bLMY"
           target="_blank"
           rel="noopener noreferrer"
         >
-          ここをクリック
+          {{ wordList.CLICK_HERE }}
         </a>
       </div>
       <v-dialog v-model="dialog" max-width="30rem">
         <v-card class="pa-4">
-          <div v-for="(item, index) in results" :key="index" style="line-height: 2.5rem; font-size: 1rem">
-            {{item.rank}}位&ensp;{{item.name}}：&nbsp;{{item.result}}&ensp;
-            <span v-if="item.point >= 0" style="font-weight: bold; color: #66BB6A">+{{item.point}}</span>
-            <span v-else style="font-weight: bold; color: #EF5350">{{item.point}}</span>
+          <div
+            v-for="(item, index) in results"
+            :key="index"
+            style="line-height: 2.5rem; font-size: 1rem"
+          >
+            {{ item.rank }}&ensp;{{ item.name }}：&nbsp;{{ item.result }}&ensp;
+            <span
+              v-if="item.point >= 0"
+              style="font-weight: bold; color: #66bb6a"
+              >+{{ item.point }}</span
+            >
+            <span v-else style="font-weight: bold; color: #ef5350">{{
+              item.point
+            }}</span>
           </div>
-          <div class="my-2" style="text-align: center">
-            <img :src="img" width="250"></img>
+          <div class="my-2 text-center">
+            <img :src="img" :alt="wordList.IMAGE" width="250" />
           </div>
         </v-card>
       </v-dialog>
@@ -60,122 +156,126 @@
 </template>
 
 <script>
+import { JP, ENG } from "~/data/language";
 export default {
+  data: () => ({
+    lang: "JP",
+    wordList: JP,
+    isNotAhanMember: false,
+    rulesValid: true,
+    scoresValid: true,
+    dialog: false,
+    oka: 25000,
+    uma: [5, 10],
+    roundBase: 5,
+    member: [
+      { name: "宮谷", result: null },
+      { name: "わた", result: null },
+      { name: "八田", result: null },
+      { name: "半田", result: null },
+    ],
+    /* 入力状態を保持するため、入力と別の配列で管理する */
+    results: [
+      { rank: "", name: "宮谷", result: "", point: 0 },
+      { rank: "", name: "わた", result: "", point: 0 },
+      { rank: "", name: "八田", result: "", point: 0 },
+      { rank: "", name: "半田", result: "", point: 0 },
+    ],
+    img: "",
+    ahanImgs: [
+      { name: "宮谷", win: "ichikawa", lose: "washizu" },
+      { name: "わた", win: "nangou", lose: "akagi" },
+      { name: "八田", win: "gori", lose: "uozumi" },
+      { name: "半田", win: "kaiji", lose: "hiro" },
+    ],
+  }),
   methods: {
+    changeLang() {
+      switch (this.lang) {
+        case "JP":
+          this.lang = "ENG";
+          this.wordList = ENG;
+          break;
+        default:
+          this.lang = "JP";
+          this.wordList = JP;
+      }
+    },
     calc() {
-      const OKA = 25000
-      const UMA = [5, 10]
-      let i = 0
-
-      /* 順位を確定し、画像を設定 */
-      for(var tmp1 of this.member) {
-        for(var tmp2 of this.results) {
-          console.log(tmp1.name + " : " + tmp2.result)
-          if (tmp1.name == tmp2.name) {
-            tmp2.result = Number(tmp1.result)
-          }
-        }
-      }
-      this.results.sort(function(a, b){
-        if(a.result < b.result) return 1
-        if(a.result > b.result) return -1
-        return 0
-      })
-      for(var tmp of this.results) {
-        tmp.rank = ++i
-      }
-      this.setImg()
-
-      for(var tmp of this.results) {
-        /* オカの計算 */   
-        tmp.point = Math.floor((tmp.result - OKA) / 1000)
-        if(tmp.result % 1000 >= 600) {
-          tmp.point++
-        } else if(tmp.result % 1000 < 0 && tmp.result % 1000 > -600) {
+      /* 順位の計算 */
+      this.results.forEach(
+        (tmp) =>
+          (tmp.result = Number(
+            this.member.find((v) => v.name === tmp.name).result
+          ))
+      );
+      this.results.sort((a, b) => {
+        return a.result < b.result ? 1 : -1;
+      });
+      this.results.forEach((tmp, idx) => (tmp.rank = idx + 1));
+      this.results.forEach((tmp) => {
+        /* オカの計算 */
+        tmp.point = Math.floor((tmp.result - this.oka) / 1000);
+        if (tmp.result % 1000 >= (this.roundBase + 1) * 100) {
+          tmp.point++;
+        } else if (
+          tmp.result % 1000 < 0 &&
+          tmp.result % 1000 > (this.roundBase + 1) * -100
+        ) {
           /* 負数はMath.floorで1多く丸められるので、捨の場合は+1する */
-          tmp.point++
+          tmp.point++;
         }
         /* ウマの計算 */
-        switch(tmp.rank) {
+        switch (tmp.rank) {
           case 1:
-            tmp.point += UMA[1]
-            break
+            tmp.point += this.uma[1];
+            break;
           case 2:
-            tmp.point += UMA[0]
-            break
+            tmp.point += this.uma[0];
+            break;
           case 3:
-            tmp.point -= UMA[0]
-            break
+            tmp.point -= this.uma[0];
+            break;
           case 4:
-            tmp.point -= UMA[1]
+            tmp.point -= this.uma[1];
         }
-      }
-      console.log(this.results)
-      this.dialog = true
+      });
+      this.setImg();
+      /* RANKを文字列に変換 */
+      this.results.forEach(
+        (tmp) =>
+          (tmp.rank =
+            this.lang === "JP"
+              ? `${tmp.rank} ${JP.RANK}`
+              : `${ENG.RANK} ${tmp.rank}`)
+      );
+      this.dialog = true;
     },
     setImg() {
-      var img = ''
-      var random = Math.floor( Math.random() * 11 )
-
-      for(var tmp of this.results) {
-        if(random % 2 == 0 && tmp.rank == 1) {
-          /* 勝利画像を設定 */
-          switch(tmp.name) {
-            case '宮谷':
-              img = 'ichikawa'
-              break
-            case 'わた':
-              img = 'nangou'
-              break
-            case '八田':
-              img = 'gori'
-              break
-            default:
-              img = 'kaiji'
-          }
-        } else if(random % 2 == 1 && tmp.rank == 4) {
-          /* 敗北画像を設定 */
-          switch(tmp.name) {
-            case '宮谷':
-              img = 'washizu'
-              break
-            case 'わた':
-              img = 'akagi'
-              break
-            case '八田':
-              img = 'uozumi'
-              break
-            default:
-              img = 'hiro'
-          }
+      let img = "who";
+      console.log(!this.isNotAhanMember);
+      if (!this.isNotAhanMember) {
+        /* A班の場合は各メンバーの画像をランダムで設定 */
+        const random = Math.floor(Math.random() * 11);
+        if (random % 2 === 0) {
+          img = this.ahanImgs.find((v) => v.name === this.results[0].name).win;
+        } else {
+          img = this.ahanImgs.find((v) => v.name === this.results[3].name).lose;
         }
       }
-      this.img = require("@/assets/img/" + img + ".jpg")
-    }
+      this.img = require("@/assets/img/" + img + ".jpg");
+    },
   },
-  data: () => ({
-    dialog: false,
-    member: [
-      { name: "宮谷", result: '' },
-      { name: "わた", result: '' },
-      { name: "八田", result: '' },
-      { name: "半田", result: '' },
-    ],
-    /* 入力状態を保存するため入力と別の配列で管理する */
-    results: [
-      { rank: '', name: "宮谷", result: '', point: 0 },
-      { rank: '', name: "わた", result: '', point: 0 },
-      { rank: '', name: "八田", result: '', point: 0 },
-      { rank: '', name: "半田", result: '', point: 0 },
-    ],
-    img: ''
-  })
 };
 </script>
 
 <style scoped lang="scss">
-.home {
+.text {
   letter-spacing: 0.15rem;
-  color: #333333;
+  color: #333;
+}
+.bg {
+  background-color: #ffdcb9;
+  min-height: 100vh;
 }
 </style>
