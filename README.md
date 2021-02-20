@@ -1,7 +1,9 @@
 # about
 Mahjong score calculation tool for my lovely team A-HAN
 
-composed by Nuxt.js / Vuetify
+# composed by
+ - Nuxt.js
+ - Vuetify
 
 # website
 > https://a-han.tk/
@@ -21,6 +23,4 @@ $ npm run start
 # generate static project
 $ npm run generate
 ```
-
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
 
