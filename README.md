@@ -1,7 +1,7 @@
 # about
 Mahjong score calculation tool for my lovely team A-HAN
 
-# composed by
+# used
  - Nuxt.js
  - Vuetify
 
