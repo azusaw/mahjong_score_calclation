@@ -1,12 +1,13 @@
 # about
 Mahjong score calculation tool for my lovely team A-HAN
 
+# website
+> https://a-han.tk/
+
 # used
  - Nuxt.js
  - Vuetify
-
-# website
-> https://a-han.tk/
+ - Netlify
 
 # build setup
 ```bash
