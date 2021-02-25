@@ -1,5 +1,6 @@
+
 # about
-Mahjong score calculation tool for my lovely team A-HAN
+Mahjong score calculation tool for my lovely team A-HAN :mahjong:
 
 # website
 > https://a-han.tk/
