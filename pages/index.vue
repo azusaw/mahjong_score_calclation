@@ -200,8 +200,8 @@ export default {
       this.results.sort((a, b) => {
         return a.score < b.score ? 1 : -1;
       });
-      this.results.forEach((tmp, idx) => (tmp.rank = idx + 1));
-      this.results.forEach((tmp) => {
+      this.results.forEach((tmp, idx) => {
+        tmp.rank = idx + 1;
         /* オカの計算 */
         tmp.point = Math.floor((tmp.score - this.oka) / 1000);
         if (tmp.score % 1000 >= (this.roundBase + 1) * 100) {
