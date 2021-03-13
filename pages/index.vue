@@ -88,7 +88,7 @@
       </v-expansion-panels>
       <v-card class="my-4 pa-8">
         <v-form ref="form" v-model="scoresValid">
-          <v-row v-for="(item, idx) in results" :key="idx" align="center">
+          <v-row v-for="(item, idx) in orderById" :key="idx" align="center">
             <v-col cols="4">
               <v-text-field
                 v-if="isNotAhanMember"
@@ -170,10 +170,10 @@ export default {
     roundBase: 5,
     /* 入力状態を保持するため、入力と別の配列で管理する */
     results: [
-      { rank: "", name: "宮谷", score: "", point: 0 },
-      { rank: "", name: "わた", score: "", point: 0 },
-      { rank: "", name: "八田", score: "", point: 0 },
-      { rank: "", name: "半田", score: "", point: 0 },
+      { id: 1, rank: "", name: "宮谷", score: "", point: 0 },
+      { id: 2, rank: "", name: "わた", score: "", point: 0 },
+      { id: 3, rank: "", name: "八田", score: "", point: 0 },
+      { id: 4, rank: "", name: "半田", score: "", point: 0 },
     ],
     img: "",
     ahanImgs: [
@@ -197,9 +197,7 @@ export default {
     },
     calc() {
       /* 順位の計算 */
-      this.results.sort((a, b) => {
-        return a.score < b.score ? 1 : -1;
-      });
+      this.results.sort((a, b) => b.score - a.score);
       this.results.forEach((tmp, idx) => {
         tmp.rank = idx + 1;
         /* オカの計算 */
@@ -251,6 +249,11 @@ export default {
         }
       }
       this.img = require("@/assets/img/" + img + ".jpg");
+    },
+  },
+  computed: {
+    orderById: function () {
+      return this.results.concat().sort((a, b) => a.id - b.id);
     },
   },
 };
