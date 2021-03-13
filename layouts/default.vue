@@ -1,17 +1,18 @@
 <template>
   <v-app>
-    <div class="app">
+    <div>
       <!-- Contents -->
       <v-content>
-        <router-view />
+        <transition name="page"><router-view /></transition>
       </v-content>
     </div>
   </v-app>
 </template>
-
+n
 <script>
 export default {
   name: "App",
+  transition: "page",
 };
 </script>
 

@@ -42,7 +42,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: [],
+  css: ["~/assets/global.css"],
   /*
    ** Nuxt.js dev-modules
    */
@@ -83,7 +83,6 @@ export default {
      */
     extend(config, ctx) {},
   },
-
   router: {
     extendRoutes(routes, resolve) {
       routes.push({
@@ -91,5 +90,9 @@ export default {
         redirect: "/",
       });
     },
+  },
+  pageTransition: {
+    name: "page",
+    mode: "out-in",
   },
 };
