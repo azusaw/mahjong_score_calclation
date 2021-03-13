@@ -88,7 +88,7 @@
       </v-expansion-panels>
       <v-card class="my-4 pa-8">
         <v-form ref="form" v-model="scoresValid">
-          <v-row v-for="(item, idx) in member" :key="idx" align="center">
+          <v-row v-for="(item, idx) in results" :key="idx" align="center">
             <v-col cols="4">
               <v-text-field
                 v-if="isNotAhanMember"
@@ -101,7 +101,7 @@
             </v-col>
             <v-col cols="8">
               <v-text-field
-                v-model="item.result"
+                v-model="item.score"
                 :label="wordList.POINTS"
                 type="number"
                 :rules="[(v) => !!v || wordList.REQUIRED]"
@@ -136,7 +136,7 @@
             :key="index"
             style="line-height: 2.5rem; font-size: 1rem"
           >
-            {{ item.rank }}&ensp;{{ item.name }}：&nbsp;{{ item.result }}&ensp;
+            {{ item.rank }}&ensp;{{ item.name }}：&nbsp;{{ item.score }}&ensp;
             <span
               v-if="item.point >= 0"
               style="font-weight: bold; color: #66bb6a"
@@ -168,18 +168,12 @@ export default {
     oka: 25000,
     uma: [5, 10],
     roundBase: 5,
-    member: [
-      { name: "宮谷", result: null },
-      { name: "わた", result: null },
-      { name: "八田", result: null },
-      { name: "半田", result: null },
-    ],
     /* 入力状態を保持するため、入力と別の配列で管理する */
     results: [
-      { rank: "", name: "宮谷", result: "", point: 0 },
-      { rank: "", name: "わた", result: "", point: 0 },
-      { rank: "", name: "八田", result: "", point: 0 },
-      { rank: "", name: "半田", result: "", point: 0 },
+      { rank: "", name: "宮谷", score: "", point: 0 },
+      { rank: "", name: "わた", score: "", point: 0 },
+      { rank: "", name: "八田", score: "", point: 0 },
+      { rank: "", name: "半田", score: "", point: 0 },
     ],
     img: "",
     ahanImgs: [
@@ -203,24 +197,18 @@ export default {
     },
     calc() {
       /* 順位の計算 */
-      this.results.forEach(
-        (tmp) =>
-          (tmp.result = Number(
-            this.member.find((v) => v.name === tmp.name).result
-          ))
-      );
       this.results.sort((a, b) => {
-        return a.result < b.result ? 1 : -1;
+        return a.score < b.score ? 1 : -1;
       });
       this.results.forEach((tmp, idx) => (tmp.rank = idx + 1));
       this.results.forEach((tmp) => {
         /* オカの計算 */
-        tmp.point = Math.floor((tmp.result - this.oka) / 1000);
-        if (tmp.result % 1000 >= (this.roundBase + 1) * 100) {
+        tmp.point = Math.floor((tmp.score - this.oka) / 1000);
+        if (tmp.score % 1000 >= (this.roundBase + 1) * 100) {
           tmp.point++;
         } else if (
-          tmp.result % 1000 < 0 &&
-          tmp.result % 1000 > (this.roundBase + 1) * -100
+          tmp.score % 1000 < 0 &&
+          tmp.score % 1000 > (this.roundBase + 1) * -100
         ) {
           /* 負数はMath.floorで1多く丸められるので、捨の場合は+1する */
           tmp.point++;
@@ -253,7 +241,6 @@ export default {
     },
     setImg() {
       let img = "who";
-      console.log(!this.isNotAhanMember);
       if (!this.isNotAhanMember) {
         /* A班の場合は各メンバーの画像をランダムで設定 */
         const random = Math.floor(Math.random() * 11);
