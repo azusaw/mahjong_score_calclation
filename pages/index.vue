@@ -1,7 +1,7 @@
 <template>
   <div class="text">
     <v-container>
-      <div v-show="!loading">
+      <div v-if="!loading">
         <div class="text-right">
           <v-btn depressed plain color="#fff" @click="changeLang">{{
             this.lang
