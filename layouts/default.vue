@@ -2,13 +2,13 @@
   <v-app>
     <div>
       <!-- Contents -->
-      <v-content>
+      <v-content v-cloak>
         <transition name="page"><router-view /></transition>
       </v-content>
     </div>
   </v-app>
 </template>
-n
+
 <script>
 export default {
   name: "App",
