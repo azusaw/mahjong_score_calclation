@@ -1,8 +1,7 @@
 <template>
   <v-app>
     <div>
-      <!-- Contents -->
-      <v-content v-cloak>
+      <v-content>
         <transition name="page"><router-view /></transition>
       </v-content>
     </div>

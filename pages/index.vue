@@ -261,7 +261,6 @@ export default {
 
 <style scoped lang="scss">
 .text {
-  letter-spacing: 0.15rem;
   color: #333;
 }
 .bg {
