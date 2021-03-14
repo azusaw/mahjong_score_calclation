@@ -1,7 +1,7 @@
 <template>
-  <div class="text bg">
-    <v-container class="mx-auto text-center" style="max-width: 25rem">
-      <div class="mx-auto text-right">
+  <div class="text">
+    <v-container>
+      <div class="text-right">
         <v-btn depressed plain color="#fff" @click="changeLang">{{
           this.lang
         }}</v-btn>
@@ -262,9 +262,5 @@ export default {
 <style scoped lang="scss">
 .text {
   color: #333;
-}
-.bg {
-  background-color: #ffdcb9;
-  min-height: 100vh;
 }
 </style>

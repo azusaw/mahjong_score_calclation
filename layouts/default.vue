@@ -1,8 +1,10 @@
 <template>
   <v-app>
     <div>
-      <v-content>
-        <transition name="page"><router-view /></transition>
+      <v-content class="bg">
+        <transition name="page">
+          <router-view class="mx-auto text-center" style="max-width: 25rem" />
+        </transition>
       </v-content>
     </div>
   </v-app>
@@ -18,5 +20,9 @@ export default {
 <style>
 a {
   text-decoration: none !important;
+}
+.bg {
+  background-color: #ffdcb9;
+  min-height: 100vh;
 }
 </style>
