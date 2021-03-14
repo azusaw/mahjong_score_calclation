@@ -1,156 +1,158 @@
 <template>
   <div class="text">
     <v-container>
-      <div class="text-right">
-        <v-btn depressed plain color="#fff" @click="changeLang">{{
-          this.lang
-        }}</v-btn>
-      </div>
-      <h1
-        style="
-          color: #ff8f00;
-          font-size: 1.2rem;
-          line-height: 6rem;
-          letter-spacing: 3px;
-        "
-      >
-        {{ wordList.TOOL_NAME }}
-      </h1>
-      <v-tooltip bottom color="#F3F3F3">
-        <template v-slot:activator="{ on, attrs }">
-          <span style="font-size: 1.1rem" v-bind="attrs" v-on="on"
-            ><v-icon class="mx-2">$mdiHelpCircleOutline</v-icon
-            ><b>{{ wordList.RULE }}</b>
-          </span>
-        </template>
-        <div class="text">
-          <ol>
-            <template v-for="rule in wordList.RULE_DETAIL">
-              <li>&nbsp;{{ rule }}</li>
-            </template>
-          </ol>
+      <div v-show="!loading">
+        <div class="text-right">
+          <v-btn depressed plain color="#fff" @click="changeLang">{{
+            this.lang
+          }}</v-btn>
         </div>
-      </v-tooltip>
-      {{ wordList.RULE_DESCRIPTION }}
-      <v-checkbox
-        v-model="isNotAhanMember"
-        :label="wordList.I_AM_NOT_AHAN"
-        on-icon="$mdiCheckboxMarked"
-        off-icon="$mdiCheckboxBlankOutline"
-        class="pl-2"
-      />
-      <v-expansion-panels v-if="isNotAhanMember" flat>
-        <v-expansion-panel style="background-color: #fff2e3">
-          <v-expansion-panel-header>{{
-            wordList.EDITING_RULES
-          }}</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-form ref="form" v-model="rulesValid">
-              <v-row align="center">
-                <v-col cols="4">{{ wordList.OKA }}</v-col>
-                <v-col cols="8">
-                  <v-text-field
-                    v-model="oka"
-                    :label="wordList.POINTS"
-                    type="number"
-                    :rules="[(v) => !!v || wordList.REQUIRED]"
-                    dense
-                  />
-                </v-col>
-                <v-col cols="4">{{ wordList.UMA }}</v-col>
-                <v-col cols="8">
-                  <template v-for="idx of Object.keys(uma)">
+        <h1
+          style="
+            color: #ff8f00;
+            font-size: 1.2rem;
+            line-height: 6rem;
+            letter-spacing: 3px;
+          "
+        >
+          {{ wordList.TOOL_NAME }}
+        </h1>
+        <v-tooltip bottom color="#F3F3F3">
+          <template v-slot:activator="{ on, attrs }">
+            <span style="font-size: 1.1rem" v-bind="attrs" v-on="on"
+              ><v-icon class="mx-2">$mdiHelpCircleOutline</v-icon
+              ><b>{{ wordList.RULE }}</b>
+            </span>
+          </template>
+          <div class="text">
+            <ol>
+              <template v-for="rule in wordList.RULE_DETAIL">
+                <li>&nbsp;{{ rule }}</li>
+              </template>
+            </ol>
+          </div>
+        </v-tooltip>
+        {{ wordList.RULE_DESCRIPTION }}
+        <v-checkbox
+          v-model="isNotAhanMember"
+          :label="wordList.I_AM_NOT_AHAN"
+          on-icon="$mdiCheckboxMarked"
+          off-icon="$mdiCheckboxBlankOutline"
+          class="pl-2"
+        />
+        <v-expansion-panels v-if="isNotAhanMember" flat>
+          <v-expansion-panel style="background-color: #fff2e3">
+            <v-expansion-panel-header>{{
+              wordList.EDITING_RULES
+            }}</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-form ref="form" v-model="rulesValid">
+                <v-row align="center">
+                  <v-col cols="4">{{ wordList.OKA }}</v-col>
+                  <v-col cols="8">
                     <v-text-field
-                      v-model="uma[idx]"
+                      v-model="oka"
+                      :label="wordList.POINTS"
                       type="number"
                       :rules="[(v) => !!v || wordList.REQUIRED]"
                       dense
-                      style="width: 50%"
                     />
-                  </template>
-                </v-col>
-                <v-col cols="4">{{ wordList.ROUND }}</v-col>
-                <v-col cols="8">
-                  <v-text-field
-                    v-model="roundBase"
-                    type="number"
-                    :rules="[(v) => !!v || wordList.REQUIRED]"
-                    dense
-                    :suffix="`${wordList.ROUND_DOWN} ${+roundBase + 1} ${
-                      wordList.ROUND_UP
-                    }`"
-                  />
-                </v-col>
-              </v-row>
-            </v-form>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-      <v-card class="my-4 pa-8">
-        <v-form ref="form" v-model="scoresValid">
-          <v-row v-for="(item, idx) in orderById" :key="idx" align="center">
-            <v-col cols="4">
-              <v-text-field
-                v-if="isNotAhanMember"
-                v-model="item.name"
-                :label="wordList.NAME + ++idx"
-                :rules="[(v) => !!v || wordList.REQUIRED]"
-                dense
-              />
-              <span v-else style="font-size: 1.2rem">{{ item.name }}</span>
-            </v-col>
-            <v-col cols="8">
-              <v-text-field
-                v-model="item.score"
-                :label="wordList.POINTS"
-                type="number"
-                :rules="[(v) => !!v || wordList.REQUIRED]"
-                dense
-              />
-            </v-col>
-          </v-row>
-          <v-btn
-            x-large
-            color="primary"
-            :disabled="!rulesValid || !scoresValid"
-            @click="calc()"
-          >
-            <span style="font-size: 1.2rem">{{ wordList.CALCULATE }}</span>
-          </v-btn>
-        </v-form>
-      </v-card>
-      <div>
-        {{ wordList.SCORE_DESCRIPTION }}
-        <a
-          href="https://onedrive.live.com/view.aspx?resid=381523E30066D964!1985&ithint=file%2cxlsx&wdLOR=c9BA1D837-F38A-414C-B55D-38D525B8F16B&authkey=!AFTAnNJkNG1bLMY"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ wordList.CLICK_HERE }}
-        </a>
-      </div>
-      <v-dialog v-model="dialog" max-width="30rem">
-        <v-card class="pa-4">
-          <div
-            v-for="(item, index) in results"
-            :key="index"
-            style="line-height: 2.5rem; font-size: 1rem"
-          >
-            {{ item.rank }}&ensp;{{ item.name }}：&nbsp;{{ item.score }}&ensp;
-            <span
-              v-if="item.point >= 0"
-              style="font-weight: bold; color: #66bb6a"
-              >+{{ item.point }}</span
+                  </v-col>
+                  <v-col cols="4">{{ wordList.UMA }}</v-col>
+                  <v-col cols="8">
+                    <template v-for="idx of Object.keys(uma)">
+                      <v-text-field
+                        v-model="uma[idx]"
+                        type="number"
+                        :rules="[(v) => !!v || wordList.REQUIRED]"
+                        dense
+                        style="width: 50%"
+                      />
+                    </template>
+                  </v-col>
+                  <v-col cols="4">{{ wordList.ROUND }}</v-col>
+                  <v-col cols="8">
+                    <v-text-field
+                      v-model="roundBase"
+                      type="number"
+                      :rules="[(v) => !!v || wordList.REQUIRED]"
+                      dense
+                      :suffix="`${wordList.ROUND_DOWN} ${+roundBase + 1} ${
+                        wordList.ROUND_UP
+                      }`"
+                    />
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <v-card class="my-4 pa-8">
+          <v-form ref="form" v-model="scoresValid">
+            <v-row v-for="(item, idx) in orderById" :key="idx" align="center">
+              <v-col cols="4">
+                <v-text-field
+                  v-if="isNotAhanMember"
+                  v-model="item.name"
+                  :label="wordList.NAME + ++idx"
+                  :rules="[(v) => !!v || wordList.REQUIRED]"
+                  dense
+                />
+                <span v-else style="font-size: 1.2rem">{{ item.name }}</span>
+              </v-col>
+              <v-col cols="8">
+                <v-text-field
+                  v-model="item.score"
+                  :label="wordList.POINTS"
+                  type="number"
+                  :rules="[(v) => !!v || wordList.REQUIRED]"
+                  dense
+                />
+              </v-col>
+            </v-row>
+            <v-btn
+              x-large
+              color="primary"
+              :disabled="!rulesValid || !scoresValid"
+              @click="calc()"
             >
-            <span v-else style="font-weight: bold; color: #ef5350">{{
-              item.point
-            }}</span>
-          </div>
-          <div class="my-2 text-center">
-            <img :src="img" :alt="wordList.IMAGE" width="250" />
-          </div>
+              <span style="font-size: 1.2rem">{{ wordList.CALCULATE }}</span>
+            </v-btn>
+          </v-form>
         </v-card>
-      </v-dialog>
+        <div>
+          {{ wordList.SCORE_DESCRIPTION }}
+          <a
+            href="https://onedrive.live.com/view.aspx?resid=381523E30066D964!1985&ithint=file%2cxlsx&wdLOR=c9BA1D837-F38A-414C-B55D-38D525B8F16B&authkey=!AFTAnNJkNG1bLMY"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ wordList.CLICK_HERE }}
+          </a>
+        </div>
+        <v-dialog v-model="dialog" max-width="30rem">
+          <v-card class="pa-4">
+            <div
+              v-for="(item, index) in results"
+              :key="index"
+              style="line-height: 2.5rem; font-size: 1rem"
+            >
+              {{ item.rank }}&ensp;{{ item.name }}：&nbsp;{{ item.score }}&ensp;
+              <span
+                v-if="item.point >= 0"
+                style="font-weight: bold; color: #66bb6a"
+                >+{{ item.point }}</span
+              >
+              <span v-else style="font-weight: bold; color: #ef5350">{{
+                item.point
+              }}</span>
+            </div>
+            <div class="my-2 text-center">
+              <img :src="img" :alt="wordList.IMAGE" width="250" />
+            </div>
+          </v-card>
+        </v-dialog>
+      </div>
     </v-container>
   </div>
 </template>
@@ -158,7 +160,11 @@
 <script>
 import { JP, ENG } from "~/data/language";
 export default {
+  mounted() {
+    this.loading = false;
+  },
   data: () => ({
+    loading: true,
     lang: "JP",
     wordList: JP,
     isNotAhanMember: false,
