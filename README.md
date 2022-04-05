@@ -3,7 +3,7 @@
 Mahjong score calculation tool for my lovely team A-HAN :mahjong:
 
 # website
-> https://a-han.tk/
+> https://a-han.netlify.app/
 
 # used
  - Nuxt.js
